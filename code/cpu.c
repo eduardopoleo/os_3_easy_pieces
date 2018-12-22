@@ -12,13 +12,13 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	char *first_argument = argv[0];
-	char *second_argument = argv[1];
+	char *str = argv[1];
 
 	while (1) {
 		Spin(1);
-		printf("FIRST %s \n", first_argument);
-		printf("SECOND %s \n", second_argument);
+		// printf makes a transformation here htat allows
+		// priting the pointer as if it was a string.
+		printf("%s \n", str);
 	}
 	return 0;
 }
