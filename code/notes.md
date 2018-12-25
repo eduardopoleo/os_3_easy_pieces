@@ -1,3 +1,5 @@
+Chapter 6
+
 OS Mechanism 
 Limited direct execution
 refers to the fact that the OS runs the process (program) directly on the CPU which will make execution faster. But the OS has no control over it
@@ -17,6 +19,7 @@ The OS does this by setting time interrupts and interrupt handlers at boot time.
     2. Non-cooperative interrupt
         1. there’s basically a timer and and timer interrupt interactions that allows the hardware to periodically return control back to the os 
 
+Chapter 7
 OS Policies
 How exactly does the OS decides which jobs, processes run first?
 Different policies that increase in complexity. Contrains:
@@ -54,9 +57,48 @@ If we consider that there can be subjobs (e.g we consider that a job time only e
 
 But we still need to relax the most important constrain: The oracle OS that know about time completions in advance.
 
+Chapter 8
+relaxes: The OS does not know how long a job is going to take
+MLFQ(Multi Level Feedback Queue)
+- Priority changes depending on different factors based on the process historical behaviour (require a lot of user)
 
+Rule 1: Highest priority jobs get processed first
+Rule 2: Jobs in the same queue are processed using round robing
 
+How does the algorithm decides what goes into which queue?
 
+Rule 3: New jobs are put on the top priority queue
+Rule 4a: Jobs that take longer than their time slice are downgraded a queue
+Rule 4b: If a job gives off the CPU before their time slice finishes (e.g makes an I/O request) stays on the same queue.
 
+3 drawbacks:
+- Many highly interactive jobs could potentially over take the CPU (starvation)
+- A bad user could game the scheduler by issuing some I/O right before the time slice finishes therefore staying on the same queie
+- jobs can change behaviour but that would not matter if they are already on the least priority queue.
 
+How to prevent jobs from starving?
+Rule 5: Boost all jobs every certain period of time e/g 50ms
 
+This long running jobs will not starve if they are multiple interactive jobs running and if their nature change they'll be treated accordingly.
+
+Drawback:
+- How long should that S (period) should be?
+
+How to prevent gaming the schedule?
+Better accounting.
+Rule 4 (modified). Once the an job has used up all his allotted time on a particular queue just drop it down a queue. This is less bad since we know that they'll keep getting boosted at a certain point.
+
+CHAPTER 9
+Lottery system
+- Each job is assined a number of tickets and a "lottery" number is assigned.
+- Jobs are stored in queue 
+- We iterate over the queue and keep adding the ticket number until the #tickets is higher than winner ticket
+- That current job gets to run
+
+Strides
+- Divide a big number e.g 10,000 by the number of tickets of each job and we each job strides
+- Pick a random job from the queue
+- After it completes add its stride to it pass number
+- Pick another job with least amount of pass ..
+- Repeat
+It's more deterministic than lotterry because it gets the proportions right but it's harder to implement because it requires to keep track of global state (pass for each job). The problem is when a new job comes in what should it be the pass number for it.
