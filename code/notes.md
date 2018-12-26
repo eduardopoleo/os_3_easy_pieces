@@ -109,5 +109,3 @@ Completely Fair Scheduler (CFS)
 - Nice value add weights to the calculation of vruntime therefore changing the likelyhood of this process to be picked later
 - Uses optimized data structure such as red/black trees to be able to retrieve processes to run fast. These data structures convert the linear scan into log n.
 - When a process sleeps for too long (because it was going I/O) it inserts it on the minimum vruntime value already present on the red/black tree to prevent that job to starve consequent ones.
-
-
