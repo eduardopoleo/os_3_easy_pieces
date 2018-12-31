@@ -109,3 +109,76 @@ Completely Fair Scheduler (CFS)
 - Nice value add weights to the calculation of vruntime therefore changing the likelyhood of this process to be picked later
 - Uses optimized data structure such as red/black trees to be able to retrieve processes to run fast. These data structures convert the linear scan into log n.
 - When a process sleeps for too long (because it was going I/O) it inserts it on the minimum vruntime value already present on the red/black tree to prevent that job to starve consequent ones.
+
+
+CHAPTER 13 Address Spaces
+- Seems that time sharing came first as a way to make most out of cpu time for example when running I/O
+- We required an affective memory model to be able to switch between different processes
+- A naive approach could have been to load 1 process at a time and make it use all memory and then switch
+    - but loading code from disk it's extremely ineficient 
+- So programs (processes) needed to be kept in memory. Things that we would store in memory were
+    - process code
+    - stack (function calls, PC, local variables, registries)
+    - heap (space use when doing malloc kept for complex data structures)
+    - both (stack and heap) in general placed in opposite spectrums of the address space and grow as the process advances
+- Now loading all running processes in memory needs to be done with caution
+- Isolation is required for:
+    - Programmer ease. So that they do not have to worry about the exact spot their program is stored
+    - Security:
+        - to prevent processe messing up with other processes
+        - processes taking all the available phiscialy memory
+    - Then when when we print out the address of a variable we'll only see the virtual address. Only the OS will ever have access to the real physical space that holds that information
+- The process of creating this isolation and memory mapping it's what's called VM
+- This process requires to be:
+    - Transparent: the VM it's only visible to the current process running in it
+    - Effecient. This mapping could not come at a heavy cost of performance
+    - protection. to other processes and the OS from rogue processes.
+
+CHAPTER 14. malloc and free
+- common pitfalls when allocating memory
+- Probably the homework would be good to check out
+    - dgb
+    - valgrind
+    - purify
+    Exterminator: Automatically Correcting Memory Errors with High Probability
+    - these are resources that provide dome practical tooling to make C development easier
+
+CHAPTER 15. Address Translation
+The key to virtualize memory it's to translate the address space memory into phisical address on a:
+- Efficient
+- Transparent (the process has not clue it's using virtual memory)
+- Safe manner (process can not access memory that shouldn't)
+
+Some assumptions:
+- Each process takes the same amount of space
+- The amound of space is fixed
+- Process are placed contigously
+- Address space is smaller than the actual physical memory available
+
+An easy approach is by setting "base and bounds" registries at the hardware level
+- Each process address space starts at a base value 
+- Each process address space should not take longer than a limit (bounce)
+- The hardware has access to both of these 
+- Translation occurs:
+    real_memory = virtual_address + base
+- if real_memory > bounce
+    - reaise an error
+- through this mechanism we can easily and safely map virtual addresses to real physical ones.
+
+See tables for more info:
+This process requires work from both the OS and hardware
+Hardware requirements:
+- Privileged mode (kernel mode)
+- Have access and be able to read Base and Bounce
+- Ability to translate the virtual_memory into real addresses
+- Privileged intructions to update base and bounce (They changed everytime we context switch)
+- Privileged intructions to raise
+- Ability to raise exceptions
+
+OS requirements:
+- Memory management
+- Base and Bounds management
+- Exception handling
+
+Drawback.
+This approach although simple leads to internal fragmentation which is basically a lot of unused space since the memory space allocated is fixed. So we'll need a better approach (complex) approach to handle memory.
